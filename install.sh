@@ -108,6 +108,7 @@ while [ $# -gt 0 ]; do
     --uuid)          QT_UUID="$2"; shift ;;
     --ws-path)       QT_WSPATH="$2"; shift ;;
     --remark)        QT_REMARK="$2"; shift ;;
+    --transport)     QT_TRANSPORT="$2"; shift ;;
     --heartbeat)     QT_HEARTBEAT="$2"; shift ;;
     --no-service)    NO_SERVICE=1 ;;
     -h|--help)
@@ -173,6 +174,12 @@ if [ "$ASSUME_YES" -eq 1 ]; then
   QT_UUID="${QT_UUID:-$(qt_gen_uuid)}"
   QT_WSPATH="${QT_WSPATH:-$(rand_path)}"
   QT_REMARK="${QT_REMARK:-quicktunnel}"
+  QT_TRANSPORT="${QT_TRANSPORT:-ws}"
+  case "$QT_TRANSPORT" in
+    ws|httpupgrade) ;;
+    xhttp) [ "$QT_MODE" = named ] || die "--transport xhttp requires --mode named (a quick tunnel cannot carry it)" ;;
+    *) die "unknown transport: $QT_TRANSPORT (ws, httpupgrade, xhttp)" ;;
+  esac
   QT_HOSTNAME="${QT_HOSTNAME:-}"
   QT_TUNNEL_NAME="${QT_TUNNEL_NAME:-}"
   [ "$QT_MODE" = named ] && [ -z "$QT_HOSTNAME" ] && die "--mode named requires --hostname"
