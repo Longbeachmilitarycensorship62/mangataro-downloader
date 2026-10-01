@@ -47,6 +47,7 @@ still works unchanged. `QT_REF=v1.0.0` pins a tag or commit instead of `main`.
 | `--socks-port N` | SOCKS port written into the client config (default 10808) |
 | `--uuid U` / `--ws-path P` | supply instead of generating |
 | `--remark R` | config name shown in client apps (default `quicktunnel`) |
+| `--transport T` | `ws` (default), `httpupgrade`, or `xhttp` (named mode only) |
 | `--heartbeat N` | WebSocket ping interval, seconds (default 30) |
 | `--prefix DIR` | install elsewhere (default `/usr/local/quicktunnel`) |
 | `--no-service` | install files only, no service |
@@ -89,14 +90,36 @@ quicktunnel-cli uninstall
 
 Most commands need `sudo`: the config holds the client credential and is mode `600`.
 
-## Why WebSocket only
+## Transports
 
-A Cloudflare Tunnel is an HTTP proxy, which rules out most Xray transports.
-Measured against a live quick tunnel:
+Cloudflare constrains the choice, and **it matters whether you use a quick
+tunnel or your own domain**:
 
-| transport | result | why |
-|---|---|---|
-| `ws` | **works** | 101 upgrade to a raw bidirectional pipe, passed through untouched |
+| transport | quick tunnel | named (your domain) | why |
+|---|---|---|---|
+| `ws` | **works** | **works** | 101 upgrade to a raw pipe the edge passes through untouched |
+| `httpupgrade` | **works**\* | **works**\* | same upgrade, no WS framing or masking, so faster |
+| `xhttp` | fails | **works** (packet-up) | see below |
+| Reality/Vision, raw TCP, mKCP, QUIC | impossible | impossible | Cloudflare terminates TLS at its edge |
+
+\* `httpupgrade` needs an Xray build carrying the `Sec-WebSocket-Key` handshake
+fix ([XTLS/Xray-core#6835](https://github.com/XTLS/Xray-core/pull/6835)). Older
+builds send an incomplete handshake and Cloudflare answers `500`. It also has no
+heartbeat, so idle connections drop after ~126s.
+
+**Why `xhttp` needs your own domain.** A quick tunnel withholds a response body
+until 131072 bytes have accumulated and never streams small writes — not even
+after an initial burst. That deadlocks XHTTP's downlink: the few KB of TLS
+handshake sit in the buffer, so traffic never reaches the threshold that would
+flush it. A 5 MB download through a quick tunnel returned 0 bytes. A real zone
+streams small writes immediately (chunks emitted 1/sec arrived 1s apart), so
+XHTTP works there. Only `packet-up` — `stream-up`/`stream-one` need a streaming
+request body, which Cloudflare buffers.
+
+**Why Reality can never work.** Cloudflare terminates TLS with its own
+certificate, so Reality's handshake never reaches this server. Measured:
+`remote error: tls: handshake failure`, with the origin seeing no connection at
+all. No port or setting changes that.
 
 Three settings in the generated configs are load-bearing:
 

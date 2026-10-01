@@ -42,6 +42,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/hossinasaadi/quicktunnel/main/
 | `--socks-port N` | 写入客户端配置的 SOCKS 端口（默认 `10808`） |
 | `--uuid U` / `--ws-path P` | 指定值，而不是自动生成 |
 | `--remark R` | 在客户端 App 中显示的配置名称（默认 `quicktunnel`） |
+| `--transport T` | `ws`（默认）、`httpupgrade` 或 `xhttp`（仅 named 模式） |
 | `--heartbeat N` | WebSocket ping 间隔，单位秒（默认 `30`） |
 | `--prefix DIR` | 安装到其他目录（默认 `/usr/local/quicktunnel`） |
 | `--no-service` | 只安装文件，不创建服务 |
@@ -81,14 +82,33 @@ quicktunnel-cli uninstall
 
 大多数命令需要 `sudo`：配置文件保存着客户端凭据，权限是 `600`。
 
-## 为什么只用 WebSocket
+## 传输方式
 
-Cloudflare Tunnel 本质上是一个 HTTP 代理，这就排除了 Xray 的大部分传输方式。
-以下是在真实隧道上实测的结果：
+可选项受 Cloudflare 限制，而且**用快速隧道还是用你自己的域名，结果不一样**：
 
-| 传输方式 | 结果 | 原因 |
-|---|---|---|
-| `ws` | **可用** | 101 升级成裸双向通道，边缘节点原样转发 |
+| 传输方式 | 快速隧道 | named（你的域名） | 原因 |
+|---|---|---|---|
+| `ws` | **可用** | **可用** | 101 升级成裸通道，边缘节点原样转发 |
+| `httpupgrade` | **可用**\* | **可用**\* | 同样的升级，但没有 WebSocket 加帧和掩码，更快 |
+| `xhttp` | 不可用 | **可用**（packet-up） | 见下文 |
+| Reality/Vision、raw TCP、mKCP、QUIC | 不可能 | 不可能 | TLS 在 Cloudflare 边缘节点终止 |
+
+\* `httpupgrade` 需要带有 `Sec-WebSocket-Key` 握手修复的 Xray
+（[XTLS/Xray-core#6835](https://github.com/XTLS/Xray-core/pull/6835)）。
+旧版本发送的握手不完整，Cloudflare 会返回 `500`。它也没有心跳，
+空闲连接约 126 秒后断开。
+
+**`xhttp` 为什么需要自己的域名。** 快速隧道会扣住响应体，直到累计 131072 字节才放行，
+并且永远不会流式发送小块数据——即使先发过一大段也一样。这会让 XHTTP 的下行死锁：
+几 KB 的 TLS 握手卡在缓冲区里，流量就永远到不了触发放行的阈值。
+实测通过快速隧道下载 5 MB，收到 0 字节。而真实 zone 会立即流式发送小块数据
+（每秒发一块，就每隔 1 秒到达一块），所以 XHTTP 在那里可用。
+只能用 `packet-up`——`stream-up` 和 `stream-one` 需要流式请求体，而 Cloudflare 会缓冲上传。
+
+**Reality 为什么永远不行。** Cloudflare 用自己的证书终止 TLS，
+所以 Reality 的握手根本到不了这台服务器。实测报
+`remote error: tls: handshake failure`，源站连一个连接都没看到。
+换端口或改配置都没用。
 
 生成的配置里有三项设置是关键：
 

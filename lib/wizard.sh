@@ -50,6 +50,38 @@ qt_wizard() {
   fi
 
   log ""
+  printf '%s%s%s\n' "$C_BOLD" "Transport" "$C_RESET"
+  log ""
+  printf '  %sws%s           101 upgrade to a raw pipe. Works everywhere, the safe default.\n' "$C_BOLD" "$C_RESET"
+  printf '  %shttpupgrade%s  Same upgrade, no WebSocket framing or masking, so measurably\n' "$C_BOLD" "$C_RESET"
+  printf '               faster. Needs Xray with the Sec-WebSocket-Key handshake fix\n'
+  printf '               (XTLS/Xray-core#6835); older builds are rejected by Cloudflare.\n'
+  printf '               No heartbeat, so idle connections drop after ~126s.\n'
+  if [ "$QT_MODE" = named ]; then
+    printf '  %sxhttp%s        Pure HTTP, no upgrade. packet-up only.\n' "$C_BOLD" "$C_RESET"
+  else
+    log ""
+    printf '  %sxhttp is not offered in quick mode: a quick tunnel withholds a response\n' "$C_DIM"
+    printf '  body until 128 KiB accumulates and never streams small writes, which\n'
+    printf '  deadlocks its downlink. It works in named mode.%s\n' "$C_RESET"
+  fi
+  log ""
+  printf '  %sReality / XTLS Vision / raw TCP / mKCP / QUIC cannot be offered at all:\n' "$C_DIM"
+  printf '  Cloudflare terminates TLS at its edge, so their handshakes never reach\n'
+  printf '  this server. Measured: "tls: handshake failure", origin saw no connection.%s\n' "$C_RESET"
+  log ""
+
+  case "${QT_TRANSPORT:-ws}" in httpupgrade) c=2 ;; xhttp) c=3 ;; *) c=1 ;; esac
+  if [ "$QT_MODE" = named ]; then
+    c="$(ask_choice "Which transport?" "$c" "ws (recommended)" "httpupgrade (faster, needs patched Xray)" "xhttp (packet-up)")"
+    case "$c" in 1) QT_TRANSPORT=ws ;; 2) QT_TRANSPORT=httpupgrade ;; 3) QT_TRANSPORT=xhttp ;; esac
+  else
+    [ "$c" = 3 ] && c=1
+    c="$(ask_choice "Which transport?" "$c" "ws (recommended)" "httpupgrade (faster, needs patched Xray)")"
+    case "$c" in 1) QT_TRANSPORT=ws ;; 2) QT_TRANSPORT=httpupgrade ;; esac
+  fi
+
+  log ""
   printf '%s%s%s\n' "$C_BOLD" "Ports" "$C_RESET"
   log ""
   while :; do
@@ -76,12 +108,12 @@ qt_wizard() {
   fi
 
   if [ -n "${QT_WSPATH:-}" ]; then
-    printf '  current WS path: %s\n' "$QT_WSPATH"
-    ask_yn "Generate a NEW WebSocket path?" n && QT_WSPATH="$(rand_path)"
+    printf '  current path: %s\n' "$QT_WSPATH"
+    ask_yn "Generate a NEW path?" n && QT_WSPATH="$(rand_path)"
   else
     QT_WSPATH="$(rand_path)"
-    printf '  generated WS path: %s\n' "$QT_WSPATH"
-    ask_yn "Use a custom path instead?" n && QT_WSPATH="$(ask 'WebSocket path' "$QT_WSPATH" valid_path)"
+    printf '  generated path: %s\n' "$QT_WSPATH"
+    ask_yn "Use a custom path instead?" n && QT_WSPATH="$(ask 'Transport path' "$QT_WSPATH" valid_path)"
   fi
 
   log ""
@@ -96,7 +128,12 @@ qt_wizard() {
   log ""
   printf '  %sCloudflare drops idle WebSockets after 100s. A ping below that keeps\n' "$C_DIM"
   printf '  long-lived idle sessions (SSH, RDP) from dying silently.%s\n' "$C_RESET"
-  QT_HEARTBEAT="$(ask 'WebSocket heartbeat seconds (0 disables)' "${QT_HEARTBEAT:-30}")"
+  if [ "$QT_TRANSPORT" = ws ]; then
+    QT_HEARTBEAT="$(ask 'WebSocket heartbeat seconds (0 disables)' "${QT_HEARTBEAT:-30}")"
+  else
+    printf '  %s(only ws has a heartbeat; %s has none)%s\n' "$C_DIM" "$QT_TRANSPORT" "$C_RESET"
+    QT_HEARTBEAT="${QT_HEARTBEAT:-30}"
+  fi
   [[ "$QT_HEARTBEAT" =~ ^[0-9]+$ ]] || QT_HEARTBEAT=30
   if [ "$QT_HEARTBEAT" -ge 100 ]; then
     warn "heartbeat >= 100s will not beat Cloudflare's idle timeout"
@@ -111,6 +148,7 @@ qt_wizard() {
   printf '%s%s%s\n' "$C_BOLD" "Summary" "$C_RESET"
   log ""
   printf '  mode        %s\n' "$QT_MODE"
+  printf '  transport   %s\n' "$QT_TRANSPORT"
   [ "$QT_MODE" = named ] && printf '  hostname    %s (tunnel: %s)\n' "$QT_HOSTNAME" "$QT_TUNNEL_NAME"
   printf '  origin      127.0.0.1:%s\n' "$QT_PORT"
   printf '  socks       127.0.0.1:%s\n' "$QT_SOCKS_PORT"
