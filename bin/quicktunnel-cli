@@ -55,6 +55,8 @@ cmd_status() {
   printf '  %-12s %b\n' service "$state"
   printf '  %-12s %s\n' mode "$QT_MODE"
   printf '  %-12s %s\n' remark "${QT_REMARK:-quicktunnel}"
+  printf '  %-12s %s\n' transport "${QT_TRANSPORT:-ws}"
+  printf '  %-12s %s\n' "xray chan" "${QT_XRAY_CHANNEL:-stable}"
   printf '  %-12s %s\n' hostname "$host"
   printf '  %-12s 127.0.0.1:%s\n' origin "$QT_PORT"
   printf '  %-12s %s\n' "ws path" "$QT_WSPATH"

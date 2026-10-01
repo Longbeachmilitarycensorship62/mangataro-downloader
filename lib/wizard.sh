@@ -82,6 +82,25 @@ qt_wizard() {
   fi
 
   log ""
+  printf '%s%s%s\n' "$C_BOLD" "Xray version" "$C_RESET"
+  log ""
+  printf '  %sXTLS flags nearly every build as a GitHub pre-release, so the "stable"\n' "$C_DIM"
+  printf '  channel lags months behind the project'"'"'s current version.%s\n' "$C_RESET"
+  log ""
+  case "${QT_XRAY_CHANNEL:-stable}" in prerelease) c=2 ;; *) c=1 ;; esac
+  c="$(ask_choice "Which Xray channel?" "$c" "stable (older, conservative)" "pre-release (current, recommended)")"
+  case "$c" in 1) QT_XRAY_CHANNEL=stable ;; 2) QT_XRAY_CHANNEL=prerelease ;; esac
+
+  # httpupgrade through Cloudflare needs the Sec-WebSocket-Key handshake, which
+  # only exists in builds newer than the current stable tag.
+  if [ "$QT_TRANSPORT" = httpupgrade ] && [ "$QT_XRAY_CHANNEL" = stable ]; then
+    log ""
+    warn "httpupgrade needs the Sec-WebSocket-Key handshake fix (XTLS/Xray-core#6835),"
+    warn "which is not in the current stable build — Cloudflare will answer 500."
+    ask_yn "Switch to the pre-release channel?" y && QT_XRAY_CHANNEL=prerelease
+  fi
+
+  log ""
   printf '%s%s%s\n' "$C_BOLD" "Ports" "$C_RESET"
   log ""
   while :; do
@@ -149,6 +168,7 @@ qt_wizard() {
   log ""
   printf '  mode        %s\n' "$QT_MODE"
   printf '  transport   %s\n' "$QT_TRANSPORT"
+  printf '  xray        %s channel\n' "$QT_XRAY_CHANNEL"
   [ "$QT_MODE" = named ] && printf '  hostname    %s (tunnel: %s)\n' "$QT_HOSTNAME" "$QT_TUNNEL_NAME"
   printf '  origin      127.0.0.1:%s\n' "$QT_PORT"
   printf '  socks       127.0.0.1:%s\n' "$QT_SOCKS_PORT"

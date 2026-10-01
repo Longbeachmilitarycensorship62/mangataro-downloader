@@ -78,6 +78,7 @@ qt_load_conf() {
   # on `set -u` when an older config file lacks them.
   QT_REMARK="${QT_REMARK:-quicktunnel}"
   QT_TRANSPORT="${QT_TRANSPORT:-ws}"
+  QT_XRAY_CHANNEL="${QT_XRAY_CHANNEL:-stable}"
 }
 
 qt_save_conf() {
@@ -87,6 +88,7 @@ qt_save_conf() {
 # quicktunnel configuration — generated $(date -u '+%Y-%m-%dT%H:%M:%SZ')
 QT_MODE=${QT_MODE}
 QT_TRANSPORT=${QT_TRANSPORT}
+QT_XRAY_CHANNEL=${QT_XRAY_CHANNEL}
 QT_PORT=${QT_PORT}
 QT_SOCKS_PORT=${QT_SOCKS_PORT}
 QT_UUID=${QT_UUID}

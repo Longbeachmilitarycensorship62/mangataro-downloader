@@ -43,6 +43,9 @@ bash <(curl -Ls https://raw.githubusercontent.com/hossinasaadi/quicktunnel/main/
 | `--uuid U` / `--ws-path P` | 指定值，而不是自动生成 |
 | `--remark R` | 在客户端 App 中显示的配置名称（默认 `quicktunnel`） |
 | `--transport T` | `ws`（默认）、`httpupgrade` 或 `xhttp`（仅 named 模式） |
+| `--pre-release` | 安装最新的 Xray 构建，包括 GitHub 预发布版 |
+| `--xray-channel C` | `stable`（默认）或 `prerelease` |
+| `--xray-version V` | 固定到指定 tag，例如 `v26.9.30` |
 | `--heartbeat N` | WebSocket ping 间隔，单位秒（默认 `30`） |
 | `--prefix DIR` | 安装到其他目录（默认 `/usr/local/quicktunnel`） |
 | `--no-service` | 只安装文件，不创建服务 |
@@ -95,8 +98,17 @@ quicktunnel-cli uninstall
 
 \* `httpupgrade` 需要带有 `Sec-WebSocket-Key` 握手修复的 Xray
 （[XTLS/Xray-core#6835](https://github.com/XTLS/Xray-core/pull/6835)）。
-旧版本发送的握手不完整，Cloudflare 会返回 `500`。它也没有心跳，
+该修复于 2026-09-29 合并，首次发布于 `v26.9.30`。旧版本发送的握手不完整，
+Cloudflare 会返回 `500`，所以请用 `--pre-release` 安装。它也没有心跳，
 空闲连接约 126 秒后断开。
+
+## Xray 版本
+
+XTLS 几乎把每个构建都标记为 GitHub 预发布版，所以 `releases/latest`——也就是默认的
+`stable` 通道——指向的 tag 会比项目当前版本落后好几个月
+（写这段时是 3 月的 `v26.3.27`，而当前是 `v26.9.30`）。
+想要当前构建就用 `--pre-release`，或者用 `--xray-version` 固定到指定 tag。
+两个通道都会同样用官方发布的 `SHA2-256` 校验。
 
 **`xhttp` 为什么需要自己的域名。** 快速隧道会扣住响应体，直到累计 131072 字节才放行，
 并且永远不会流式发送小块数据——即使先发过一大段也一样。这会让 XHTTP 的下行死锁：

@@ -48,6 +48,9 @@ still works unchanged. `QT_REF=v1.0.0` pins a tag or commit instead of `main`.
 | `--uuid U` / `--ws-path P` | supply instead of generating |
 | `--remark R` | config name shown in client apps (default `quicktunnel`) |
 | `--transport T` | `ws` (default), `httpupgrade`, or `xhttp` (named mode only) |
+| `--pre-release` | install the newest Xray build, including GitHub pre-releases |
+| `--xray-channel C` | `stable` (default) or `prerelease` |
+| `--xray-version V` | pin an exact tag, e.g. `v26.9.30` |
 | `--heartbeat N` | WebSocket ping interval, seconds (default 30) |
 | `--prefix DIR` | install elsewhere (default `/usr/local/quicktunnel`) |
 | `--no-service` | install files only, no service |
@@ -103,9 +106,19 @@ tunnel or your own domain**:
 | Reality/Vision, raw TCP, mKCP, QUIC | impossible | impossible | Cloudflare terminates TLS at its edge |
 
 \* `httpupgrade` needs an Xray build carrying the `Sec-WebSocket-Key` handshake
-fix ([XTLS/Xray-core#6835](https://github.com/XTLS/Xray-core/pull/6835)). Older
-builds send an incomplete handshake and Cloudflare answers `500`. It also has no
-heartbeat, so idle connections drop after ~126s.
+fix ([XTLS/Xray-core#6835](https://github.com/XTLS/Xray-core/pull/6835), merged
+2026-09-29, first shipped in `v26.9.30`). Older builds send an incomplete
+handshake and Cloudflare answers `500`, so install with `--pre-release`. It also
+has no heartbeat, so idle connections drop after ~126s.
+
+## Xray version
+
+XTLS flags nearly every build as a GitHub pre-release, so `releases/latest` — and
+therefore the default `stable` channel — resolves to a tag that is months behind
+the project's current version (at time of writing `v26.3.27` from March, against
+`v26.9.30`). Use `--pre-release` for the current build, or `--xray-version` to
+pin an exact tag. Both channels are checksum-verified against the published
+`SHA2-256` the same way.
 
 **Why `xhttp` needs your own domain.** A quick tunnel withholds a response body
 until 131072 bytes have accumulated and never streams small writes — not even
