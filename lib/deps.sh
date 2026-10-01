@@ -3,7 +3,10 @@
 # Binaries are installed under $QT_BIN so quicktunnel owns its own toolchain
 # and does not depend on whatever happens to be on PATH.
 
-GH_XRAY="https://api.github.com/repos/XTLS/Xray-core/releases/latest"
+# XTLS flags nearly every build as a GitHub pre-release, so /releases/latest
+# resolves to a much older tag than the project's actual current version. The
+# list endpoint is used instead so both channels are reachable.
+GH_XRAY_LIST="https://api.github.com/repos/XTLS/Xray-core/releases?per_page=30"
 GH_CFD="https://github.com/cloudflare/cloudflared/releases/latest/download"
 
 qt_have() { command -v "$1" >/dev/null 2>&1; }
@@ -15,11 +18,32 @@ qt_need_tools() {
 }
 
 # Resolve the newest Xray-core tag, or honour an explicit QT_XRAY_VERSION.
-qt_xray_latest_tag() {
+# Newest non-draft tag on the requested channel.
+#   QT_XRAY_CHANNEL=prerelease  newest build of any kind
+#   QT_XRAY_CHANNEL=stable      newest build NOT flagged pre-release (default)
+# QT_XRAY_VERSION pins an exact tag and wins over both.
+qt_xray_tag() {
   if [ -n "${QT_XRAY_VERSION:-}" ]; then printf '%s' "$QT_XRAY_VERSION"; return; fi
-  curl -fsSL --max-time 30 "$GH_XRAY" \
-    | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -1
+  local want_pre=0
+  [ "${QT_XRAY_CHANNEL:-stable}" = prerelease ] && want_pre=1
+  # No early exit: closing the pipe mid-body makes curl fail with "(56) Failure
+  # writing output", which is noise on an installer's stderr and a non-zero exit.
+  # Read the whole body and keep only the first match instead.
+  curl -fsSL --max-time 30 "$GH_XRAY_LIST" | awk -v want_pre="$want_pre" '
+    /"tag_name"/ { if (match($0, /"tag_name": *"[^"]*"/)) {
+                     t = substr($0, RSTART, RLENGTH); gsub(/.*: *"|"$/, "", t); tag = t } }
+    /"draft"/      { draft = /true/ }
+    /"prerelease"/ { pre = /true/
+                     # prerelease is the last of the three fields per record, so
+                     # the record is complete at this point.
+                     if (found == "" && tag != "" && !draft && (want_pre || !pre)) { found = tag }
+                     tag = "" }
+    END { if (found != "") print found }
+  '
 }
+
+# Kept for callers that still use the old name.
+qt_xray_latest_tag() { qt_xray_tag; }
 
 qt_sha256() {
   if qt_have sha256sum; then sha256sum "$1" | awk '{print $1}'
@@ -30,8 +54,8 @@ qt_sha256() {
 # Download Xray and verify it against the published .dgst before installing.
 qt_fetch_xray() {
   local tag asset url tmp want got
-  tag="$(qt_xray_latest_tag)"
-  [ -n "$tag" ] || die "could not determine latest Xray version"
+  tag="$(qt_xray_tag)"
+  [ -n "$tag" ] || die "could not determine an Xray version on the ${QT_XRAY_CHANNEL:-stable} channel"
 
   case "$(qt_os)" in
     linux) asset="Xray-linux-$(qt_arch).zip" ;;
@@ -39,7 +63,7 @@ qt_fetch_xray() {
   esac
   url="https://github.com/XTLS/Xray-core/releases/download/$tag/$asset"
 
-  info "downloading Xray $tag ($asset)"
+  info "downloading Xray $tag ($asset, ${QT_XRAY_CHANNEL:-stable} channel)"
   tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' RETURN
   curl -fsSL --max-time 300 -o "$tmp/x.zip" "$url" || die "download failed: $url"
 

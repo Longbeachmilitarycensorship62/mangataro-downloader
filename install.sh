@@ -109,6 +109,9 @@ while [ $# -gt 0 ]; do
     --ws-path)       QT_WSPATH="$2"; shift ;;
     --remark)        QT_REMARK="$2"; shift ;;
     --transport)     QT_TRANSPORT="$2"; shift ;;
+    --xray-channel)  QT_XRAY_CHANNEL="$2"; shift ;;
+    --pre-release)   QT_XRAY_CHANNEL=prerelease ;;
+    --xray-version)  QT_XRAY_VERSION="$2"; shift ;;
     --heartbeat)     QT_HEARTBEAT="$2"; shift ;;
     --no-service)    NO_SERVICE=1 ;;
     -h|--help)
@@ -175,10 +178,15 @@ if [ "$ASSUME_YES" -eq 1 ]; then
   QT_WSPATH="${QT_WSPATH:-$(rand_path)}"
   QT_REMARK="${QT_REMARK:-quicktunnel}"
   QT_TRANSPORT="${QT_TRANSPORT:-ws}"
+  QT_XRAY_CHANNEL="${QT_XRAY_CHANNEL:-stable}"
   case "$QT_TRANSPORT" in
     ws|httpupgrade) ;;
     xhttp) [ "$QT_MODE" = named ] || die "--transport xhttp requires --mode named (a quick tunnel cannot carry it)" ;;
     *) die "unknown transport: $QT_TRANSPORT (ws, httpupgrade, xhttp)" ;;
+  esac
+  case "$QT_XRAY_CHANNEL" in
+    stable|prerelease) ;;
+    *) die "unknown xray channel: $QT_XRAY_CHANNEL (stable, prerelease)" ;;
   esac
   QT_HOSTNAME="${QT_HOSTNAME:-}"
   QT_TUNNEL_NAME="${QT_TUNNEL_NAME:-}"
